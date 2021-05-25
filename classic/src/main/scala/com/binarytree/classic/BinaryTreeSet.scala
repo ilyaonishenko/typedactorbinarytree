@@ -1,6 +1,7 @@
 package com.binarytree.classic
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.event.LoggingAdapter
 import akka.util.Timeout
 
 import scala.collection.immutable.Queue
@@ -18,8 +19,8 @@ object BinaryTreeSet {
 
   case class Insert(requester: ActorRef, id: Int, elem: Int) extends Operation
   case class Contains(requester: ActorRef, id: Int, elem: Int) extends Operation
-  case class Remove(requester: ActorRef, id: Int, elem: Int) extends Operation
-  case object GC
+//  case class Remove(requester: ActorRef, id: Int, elem: Int) extends Operation
+//  case object GC
   case class ContainsResult(id: Int, result: Boolean) extends OperationReply
   case class OperationFinished(id: Int) extends OperationReply
 
@@ -32,10 +33,10 @@ object BinaryTreeSet {
 
     val normal: Receive = {
       case op: Operation => root ! op
-      case GC => ???
+//      case GC => ???
     }
 
-    def garbageCollecting(newRoot: ActorRef): Receive = ???
+//    def garbageCollecting(newRoot: ActorRef): Receive = ???
   }
 
   object BinaryTreeNode {
@@ -43,10 +44,10 @@ object BinaryTreeSet {
     case object Left extends Position
     case object Right extends Position
 
-    case class CopyTo(treeNode: ActorRef)
-    case object CopyFinished
+//    case class CopyTo(treeNode: ActorRef)
+//    case object CopyFinished
 
-    def props(elem: Int, initiallyRemoved: Boolean) = Props(new BinaryTreeNode(elem, initiallyRemoved))
+    def props(elem: Int, initiallyRemoved: Boolean): Props = Props(new BinaryTreeNode(elem, initiallyRemoved))
   }
 
   class BinaryTreeNode(val elem: Int, initiallyRemoved: Boolean) extends Actor {
@@ -79,7 +80,7 @@ object BinaryTreeSet {
     private def checkLeaf(searchFor: Int): Position =
       if (searchFor > elem) Right else Left
 
-    def copying(expected: Set[ActorRef], insertConfirmed: Boolean): Receive = ???
+//    def copying(expected: Set[ActorRef], insertConfirmed: Boolean): Receive = ???
   }
 }
 
@@ -96,7 +97,7 @@ object TestClassic extends App {
   case class Check(id: Int, el: Int)
 
   class TestActor() extends Actor {
-    val log = Logging(context.system, this)
+    val log: LoggingAdapter = Logging(context.system, this)
     override def receive: Receive = {
       case Act(id, el) =>
         binaryTreeSet ! Insert(self, id, el)
@@ -118,8 +119,8 @@ object TestClassic extends App {
   testActor ! Act(0, 1)
   testActor ! Act(1, 2)
   testActor ! Act(2, 3)
-  testActor ! Check(1, 1)
-  testActor ! Check(3, 2)
-  testActor ! Check(4, 3)
-  testActor ! Check(5, 4)
+  testActor ! Check(3, 1)
+  testActor ! Check(4, 2)
+  testActor ! Check(5, 3)
+  testActor ! Check(6, 4)
 }
